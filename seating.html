@@ -27,11 +27,82 @@
     color: white;
     padding: 16px 18px;
     border-radius: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     text-align: center;
   }
   header h1 { font-size: 1.35rem; margin-bottom: 4px; }
   header p { font-size: 0.9rem; opacity: 0.9; }
+
+  /* Search */
+  .search-box {
+    background: white;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .search-box label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .search-input-wrap {
+    display: flex;
+    gap: 8px;
+  }
+  #searchInput {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1.5px solid #cbd5e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+  }
+  #searchInput:focus {
+    border-color: #2b6cb0;
+    box-shadow: 0 0 0 3px rgba(43,108,176,0.15);
+  }
+  #clearBtn {
+    padding: 0 14px;
+    border: none;
+    background: #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  #searchResults {
+    margin-top: 10px;
+  }
+  .result-item {
+    padding: 10px 12px;
+    background: #ebf8ff;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+  .result-item .r-name { font-weight: 600; }
+  .result-item .r-table {
+    background: #2b6cb0;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+  .result-item a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .no-result {
+    color: var(--muted);
+    font-size: 0.9rem;
+    padding: 6px 0;
+  }
 
   .floorplan {
     background: white;
@@ -47,8 +118,6 @@
     color: var(--muted);
     margin-bottom: 16px;
   }
-
-  /* Horizontal layout matching the paper */
   .layout {
     display: flex;
     flex-direction: column;
@@ -62,13 +131,7 @@
     align-items: center;
     gap: 12px;
   }
-  .row.top { gap: 10px; }
-  .row.mid { gap: 10px; }
-  .row.bot { gap: 18px; margin-top: 4px; }
-
-  .spacer { width: 28px; }
   .big-spacer { width: 48px; }
-
   .t {
     width: 62px;
     height: 62px;
@@ -109,6 +172,10 @@
     background: transparent;
     pointer-events: none;
   }
+  .t.highlight {
+    box-shadow: 0 0 0 4px #f6e05e, 0 4px 14px rgba(0,0,0,0.2);
+    transform: scale(1.12);
+  }
   .reception {
     width: 52px;
     height: 70px;
@@ -121,7 +188,6 @@
     color: var(--muted);
     background: #edf2f7;
     writing-mode: vertical-rl;
-    text-orientation: mixed;
     letter-spacing: 2px;
   }
 
@@ -143,6 +209,9 @@
     box-shadow: 0 1px 6px rgba(0,0,0,0.06);
     border: 1px solid #e2e8f0;
   }
+  .card.highlight-card {
+    box-shadow: 0 0 0 3px #f6e05e, 0 4px 16px rgba(0,0,0,0.12);
+  }
   .card-header {
     background: #2b6cb0;
     color: white;
@@ -161,11 +230,8 @@
     border-radius: 10px;
     font-size: 0.8rem;
   }
-  .badge.over { background: #fc8181; }
   .guest-list {
     list-style: none;
-    max-height: 260px;
-    overflow-y: auto;
   }
   .guest-list li {
     padding: 7px 14px;
@@ -176,6 +242,10 @@
   }
   .guest-list li:nth-child(even) { background: #f7fafc; }
   .guest-list li:last-child { border-bottom: none; }
+  .guest-list li.hit {
+    background: #fefcbf !important;
+    font-weight: 600;
+  }
   .num { color: var(--muted); min-width: 20px; font-size: 0.85rem; }
   .name { font-weight: 500; flex: 1; }
   .note { font-size: 0.78rem; color: var(--muted); }
@@ -189,7 +259,7 @@
   }
 
   @media (max-width: 560px) {
-    .layout { min-width: 0; transform: scale(0.92); transform-origin: top center; }
+    .layout { min-width: 0; transform: scale(0.90); transform-origin: top center; }
     .t { width: 52px; height: 52px; font-size: 1rem; }
     .t.main { width: 62px; height: 62px; }
     .row { gap: 8px; }
@@ -202,39 +272,43 @@
     <p>總人數 175　｜　按現場實際橫向擺位</p>
   </header>
 
+  <div class="search-box">
+    <label for="searchInput">搜尋嘉賓姓名</label>
+    <div class="search-input-wrap">
+      <input type="text" id="searchInput" placeholder="輸入姓名（支援部分字）..." autocomplete="off">
+      <button id="clearBtn" type="button">清除</button>
+    </div>
+    <div id="searchResults"></div>
+  </div>
+
   <div class="floorplan">
     <div class="floorplan-title">現場枱位示意圖（點擊可跳到名單）</div>
     <div class="layout">
-      <!-- Top row: 10 9 8   主家   5 3 1 -->
-      <div class="row top">
-        <a href="#t10" class="t">10<span class="c">12位</span></a>
-        <a href="#t9" class="t">9<span class="c">12位</span></a>
-        <a href="#t8" class="t">8<span class="c">12位</span></a>
+      <div class="row">
+        <a href="#t10" class="t" id="circle-10">10<span class="c">12位</span></a>
+        <a href="#t9" class="t" id="circle-9">9<span class="c">12位</span></a>
+        <a href="#t8" class="t" id="circle-8">8<span class="c">12位</span></a>
         <div class="big-spacer"></div>
-        <a href="#t主家" class="t main">主家<span class="c">13位</span></a>
+        <a href="#t主家" class="t main" id="circle-主家">主家<span class="c">13位</span></a>
         <div class="big-spacer"></div>
-        <a href="#t5" class="t">5<span class="c">13位</span></a>
-        <a href="#t3" class="t">3<span class="c">12位</span></a>
-        <a href="#t1" class="t">1<span class="c">12位</span></a>
+        <a href="#t5" class="t" id="circle-5">5<span class="c">13位</span></a>
+        <a href="#t3" class="t" id="circle-3">3<span class="c">12位</span></a>
+        <a href="#t1" class="t" id="circle-1">1<span class="c">12位</span></a>
       </div>
-
-      <!-- Mid row: 11 12 13      7 6 2 -->
-      <div class="row mid">
-        <a href="#t11" class="t">11<span class="c">13位</span></a>
-        <a href="#t12" class="t">12<span class="c">12位</span></a>
-        <a href="#t13" class="t">13<span class="c">14位</span></a>
+      <div class="row">
+        <a href="#t11" class="t" id="circle-11">11<span class="c">13位</span></a>
+        <a href="#t12" class="t" id="circle-12">12<span class="c">12位</span></a>
+        <a href="#t13" class="t" id="circle-13">13<span class="c">14位</span></a>
         <div class="big-spacer"></div>
         <div class="big-spacer"></div>
         <div class="big-spacer"></div>
-        <a href="#t7" class="t">7<span class="c">12位</span></a>
-        <a href="#t6" class="t">6<span class="c">12位</span></a>
-        <a href="#t2" class="t">2<span class="c">12位</span></a>
+        <a href="#t7" class="t" id="circle-7">7<span class="c">12位</span></a>
+        <a href="#t6" class="t" id="circle-6">6<span class="c">12位</span></a>
+        <a href="#t2" class="t" id="circle-2">2<span class="c">12位</span></a>
       </div>
-
-      <!-- Bottom: empty  15    接待處 -->
-      <div class="row bot">
+      <div class="row">
         <div class="t empty"></div>
-        <a href="#t15" class="t">15<span class="c">13位</span></a>
+        <a href="#t15" class="t" id="circle-15">15<span class="c">13位</span></a>
         <div class="big-spacer"></div>
         <div class="reception">接待處</div>
       </div>
@@ -249,67 +323,67 @@
         <span class="badge">13/13 人</span>
       </div>
       <ul class="guest-list">
-        <li>
+        <li data-name="黃炳旋舅父#">
           <span class="num">1.</span>
           <span class="name">黃炳旋舅父#</span>
           <span class="note">主家親戚</span>
         </li>
-        <li>
+        <li data-name="黃炳旋舅母">
           <span class="num">2.</span>
           <span class="name">黃炳旋舅母</span>
           <span class="note">主家親戚</span>
         </li>
-        <li>
+        <li data-name="胡振坤姐夫">
           <span class="num">3.</span>
           <span class="name">胡振坤姐夫</span>
           <span class="note">主家親戚</span>
         </li>
-        <li>
+        <li data-name="林秀欣家姐">
           <span class="num">4.</span>
           <span class="name">林秀欣家姐</span>
           <span class="note">主家親戚</span>
         </li>
-        <li>
+        <li data-name="林光蔚大哥">
           <span class="num">5.</span>
           <span class="name">林光蔚大哥</span>
           <span class="note">主家親戚</span>
         </li>
-        <li>
+        <li data-name="林光蔚大嫂">
           <span class="num">6.</span>
           <span class="name">林光蔚大嫂</span>
           <span class="note">主家親戚</span>
         </li>
-        <li>
+        <li data-name="林絳華">
           <span class="num">7.</span>
           <span class="name">林絳華</span>
           <span class="note">主家親戚</span>
         </li>
-        <li>
+        <li data-name="余惠芳">
           <span class="num">8.</span>
           <span class="name">余惠芳</span>
           <span class="note">主家親戚</span>
         </li>
-        <li>
+        <li data-name="林信澤叔叔">
           <span class="num">9.</span>
           <span class="name">林信澤叔叔</span>
           <span class="note">主家親戚</span>
         </li>
-        <li>
+        <li data-name="林信澤嬸嬸">
           <span class="num">10.</span>
           <span class="name">林信澤嬸嬸</span>
           <span class="note">主家親戚</span>
         </li>
-        <li>
+        <li data-name="陳栢堅媽咪">
           <span class="num">11.</span>
           <span class="name">陳栢堅媽咪</span>
           <span class="note">主家親戚</span>
         </li>
-        <li>
+        <li data-name="蘇明村博士">
           <span class="num">12.</span>
           <span class="name">蘇明村博士</span>
           <span class="note">主家親戚</span>
         </li>
-        <li>
+        <li data-name="姐姐（舅父工人）">
           <span class="num">13.</span>
           <span class="name">姐姐（舅父工人）</span>
           <span class="note">主家親戚</span>
@@ -322,62 +396,62 @@
         <span class="badge">12/12 人</span>
       </div>
       <ul class="guest-list">
-        <li>
+        <li data-name="梁景芳">
           <span class="num">1.</span>
           <span class="name">梁景芳</span>
           <span class="note">9301</span>
         </li>
-        <li>
+        <li data-name="梁景芳">
           <span class="num">2.</span>
           <span class="name">梁景芳</span>
           <span class="note">9301</span>
         </li>
-        <li>
+        <li data-name="梁景芳">
           <span class="num">3.</span>
           <span class="name">梁景芳</span>
           <span class="note">9301</span>
         </li>
-        <li>
+        <li data-name="梁景芳">
           <span class="num">4.</span>
           <span class="name">梁景芳</span>
           <span class="note">9301</span>
         </li>
-        <li>
+        <li data-name="梁景芳">
           <span class="num">5.</span>
           <span class="name">梁景芳</span>
           <span class="note">9301</span>
         </li>
-        <li>
+        <li data-name="梁景芳">
           <span class="num">6.</span>
           <span class="name">梁景芳</span>
           <span class="note">9301</span>
         </li>
-        <li>
+        <li data-name="梁景芳">
           <span class="num">7.</span>
           <span class="name">梁景芳</span>
           <span class="note">9301</span>
         </li>
-        <li>
+        <li data-name="梁景芳">
           <span class="num">8.</span>
           <span class="name">梁景芳</span>
           <span class="note">9301</span>
         </li>
-        <li>
+        <li data-name="梁景芳">
           <span class="num">9.</span>
           <span class="name">梁景芳</span>
           <span class="note">9301</span>
         </li>
-        <li>
+        <li data-name="梁景芳">
           <span class="num">10.</span>
           <span class="name">梁景芳</span>
           <span class="note">9301</span>
         </li>
-        <li>
+        <li data-name="梁景芳">
           <span class="num">11.</span>
           <span class="name">梁景芳</span>
           <span class="note">9301</span>
         </li>
-        <li>
+        <li data-name="梁景芳">
           <span class="num">12.</span>
           <span class="name">梁景芳</span>
           <span class="note">9301</span>
@@ -390,62 +464,62 @@
         <span class="badge">12/12 人</span>
       </div>
       <ul class="guest-list">
-        <li>
+        <li data-name="郭錫培">
           <span class="num">1.</span>
           <span class="name">郭錫培</span>
           <span class="note">校友</span>
         </li>
-        <li>
+        <li data-name="李少華">
           <span class="num">2.</span>
           <span class="name">李少華</span>
           <span class="note">校友</span>
         </li>
-        <li>
+        <li data-name="駱意卿">
           <span class="num">3.</span>
           <span class="name">駱意卿</span>
           <span class="note">校友</span>
         </li>
-        <li>
+        <li data-name="何麗顏">
           <span class="num">4.</span>
           <span class="name">何麗顏</span>
           <span class="note">校友</span>
         </li>
-        <li>
+        <li data-name="林美玲">
           <span class="num">5.</span>
           <span class="name">林美玲</span>
           <span class="note">校友</span>
         </li>
-        <li>
+        <li data-name="萬世艷">
           <span class="num">6.</span>
           <span class="name">萬世艷</span>
           <span class="note">校友</span>
         </li>
-        <li>
+        <li data-name="羅與儀">
           <span class="num">7.</span>
           <span class="name">羅與儀</span>
           <span class="note">校友</span>
         </li>
-        <li>
+        <li data-name="Caron Tam">
           <span class="num">8.</span>
           <span class="name">Caron Tam</span>
           <span class="note">校友</span>
         </li>
-        <li>
+        <li data-name="吳國輝">
           <span class="num">9.</span>
           <span class="name">吳國輝</span>
           <span class="note">校友</span>
         </li>
-        <li>
+        <li data-name="羅與儀">
           <span class="num">10.</span>
           <span class="name">羅與儀</span>
           <span class="note">校友</span>
         </li>
-        <li>
+        <li data-name="Victor">
           <span class="num">11.</span>
           <span class="name">Victor</span>
           <span class="note">校友</span>
         </li>
-        <li>
+        <li data-name="林斯琪">
           <span class="num">12.</span>
           <span class="name">林斯琪</span>
           <span class="note">校友</span>
@@ -458,62 +532,62 @@
         <span class="badge">12/12 人</span>
       </div>
       <ul class="guest-list">
-        <li>
+        <li data-name="李財興">
           <span class="num">1.</span>
           <span class="name">李財興</span>
           <span class="note">9303</span>
         </li>
-        <li>
+        <li data-name="李婉玲">
           <span class="num">2.</span>
           <span class="name">李婉玲</span>
           <span class="note">9303</span>
         </li>
-        <li>
+        <li data-name="黃  偉">
           <span class="num">3.</span>
           <span class="name">黃  偉</span>
           <span class="note">9303</span>
         </li>
-        <li>
+        <li data-name="黃炤熙">
           <span class="num">4.</span>
           <span class="name">黃炤熙</span>
           <span class="note">9303</span>
         </li>
-        <li>
+        <li data-name="梁麗蓉">
           <span class="num">5.</span>
           <span class="name">梁麗蓉</span>
           <span class="note">9303</span>
         </li>
-        <li>
+        <li data-name="賴仲發">
           <span class="num">6.</span>
           <span class="name">賴仲發</span>
           <span class="note">9303</span>
         </li>
-        <li>
+        <li data-name="羅愛玲">
           <span class="num">7.</span>
           <span class="name">羅愛玲</span>
           <span class="note">9303</span>
         </li>
-        <li>
+        <li data-name="羅漢元#">
           <span class="num">8.</span>
           <span class="name">羅漢元#</span>
           <span class="note">9303</span>
         </li>
-        <li>
+        <li data-name="張柱樑">
           <span class="num">9.</span>
           <span class="name">張柱樑</span>
           <span class="note">9303</span>
         </li>
-        <li>
+        <li data-name="Allan">
           <span class="num">10.</span>
           <span class="name">Allan</span>
           <span class="note">9303</span>
         </li>
-        <li>
+        <li data-name="Eddie">
           <span class="num">11.</span>
           <span class="name">Eddie</span>
           <span class="note">9303</span>
         </li>
-        <li>
+        <li data-name="Kenny">
           <span class="num">12.</span>
           <span class="name">Kenny</span>
           <span class="note">9303</span>
@@ -526,67 +600,67 @@
         <span class="badge">13/13 人</span>
       </div>
       <ul class="guest-list">
-        <li>
+        <li data-name="陳錦儀">
           <span class="num">1.</span>
           <span class="name">陳錦儀</span>
           <span class="note">9305</span>
         </li>
-        <li>
+        <li data-name="陳錦儀">
           <span class="num">2.</span>
           <span class="name">陳錦儀</span>
           <span class="note">9305</span>
         </li>
-        <li>
+        <li data-name="張勁光">
           <span class="num">3.</span>
           <span class="name">張勁光</span>
           <span class="note">9305</span>
         </li>
-        <li>
+        <li data-name="張勁光太太">
           <span class="num">4.</span>
           <span class="name">張勁光太太</span>
           <span class="note">9305</span>
         </li>
-        <li>
+        <li data-name="張爸爸">
           <span class="num">5.</span>
           <span class="name">張爸爸</span>
           <span class="note">9305</span>
         </li>
-        <li>
+        <li data-name="張媽媽">
           <span class="num">6.</span>
           <span class="name">張媽媽</span>
           <span class="note">9305</span>
         </li>
-        <li>
+        <li data-name="Francis">
           <span class="num">7.</span>
           <span class="name">Francis</span>
           <span class="note">9305</span>
         </li>
-        <li>
+        <li data-name="SA">
           <span class="num">8.</span>
           <span class="name">SA</span>
           <span class="note">9305</span>
         </li>
-        <li>
+        <li data-name="胡達文">
           <span class="num">9.</span>
           <span class="name">胡達文</span>
           <span class="note">9305</span>
         </li>
-        <li>
+        <li data-name="邱婉儀">
           <span class="num">10.</span>
           <span class="name">邱婉儀</span>
           <span class="note">9305</span>
         </li>
-        <li>
+        <li data-name="楊滿昌">
           <span class="num">11.</span>
           <span class="name">楊滿昌</span>
           <span class="note">9305</span>
         </li>
-        <li>
+        <li data-name="劉玉丹">
           <span class="num">12.</span>
           <span class="name">劉玉丹</span>
           <span class="note">9305</span>
         </li>
-        <li>
+        <li data-name="Stephanie">
           <span class="num">13.</span>
           <span class="name">Stephanie</span>
           <span class="note">9305</span>
@@ -599,62 +673,62 @@
         <span class="badge">12/12 人</span>
       </div>
       <ul class="guest-list">
-        <li>
+        <li data-name="李蘭桂">
           <span class="num">1.</span>
           <span class="name">李蘭桂</span>
           <span class="note">9306</span>
         </li>
-        <li>
+        <li data-name="蘇偉雄">
           <span class="num">2.</span>
           <span class="name">蘇偉雄</span>
           <span class="note">9306</span>
         </li>
-        <li>
+        <li data-name="蘇偉雄">
           <span class="num">3.</span>
           <span class="name">蘇偉雄</span>
           <span class="note">9306</span>
         </li>
-        <li>
+        <li data-name="雷依齡">
           <span class="num">4.</span>
           <span class="name">雷依齡</span>
           <span class="note">9306</span>
         </li>
-        <li>
+        <li data-name="陳許明#">
           <span class="num">5.</span>
           <span class="name">陳許明#</span>
           <span class="note">9306</span>
         </li>
-        <li>
+        <li data-name="陳許明">
           <span class="num">6.</span>
           <span class="name">陳許明</span>
           <span class="note">9306</span>
         </li>
-        <li>
+        <li data-name="陳許明">
           <span class="num">7.</span>
           <span class="name">陳許明</span>
           <span class="note">9306</span>
         </li>
-        <li>
+        <li data-name="余美媚">
           <span class="num">8.</span>
           <span class="name">余美媚</span>
           <span class="note">9306</span>
         </li>
-        <li>
+        <li data-name="余美媚">
           <span class="num">9.</span>
           <span class="name">余美媚</span>
           <span class="note">9306</span>
         </li>
-        <li>
+        <li data-name="Vicky So">
           <span class="num">10.</span>
           <span class="name">Vicky So</span>
           <span class="note">9306</span>
         </li>
-        <li>
+        <li data-name="Vicky So">
           <span class="num">11.</span>
           <span class="name">Vicky So</span>
           <span class="note">9306</span>
         </li>
-        <li>
+        <li data-name="Vicky So">
           <span class="num">12.</span>
           <span class="name">Vicky So</span>
           <span class="note">9306</span>
@@ -667,62 +741,62 @@
         <span class="badge">12/12 人</span>
       </div>
       <ul class="guest-list">
-        <li>
+        <li data-name="阿立">
           <span class="num">1.</span>
           <span class="name">阿立</span>
           <span class="note">親戚</span>
         </li>
-        <li>
+        <li data-name="阿立">
           <span class="num">2.</span>
           <span class="name">阿立</span>
           <span class="note">親戚</span>
         </li>
-        <li>
+        <li data-name="黃宇秋">
           <span class="num">3.</span>
           <span class="name">黃宇秋</span>
           <span class="note">親戚</span>
         </li>
-        <li>
+        <li data-name="黃宇秋">
           <span class="num">4.</span>
           <span class="name">黃宇秋</span>
           <span class="note">親戚</span>
         </li>
-        <li>
+        <li data-name="黃宇秋">
           <span class="num">5.</span>
           <span class="name">黃宇秋</span>
           <span class="note">親戚</span>
         </li>
-        <li>
+        <li data-name="黃宇秋">
           <span class="num">6.</span>
           <span class="name">黃宇秋</span>
           <span class="note">親戚</span>
         </li>
-        <li>
+        <li data-name="林向然">
           <span class="num">7.</span>
           <span class="name">林向然</span>
           <span class="note">親戚</span>
         </li>
-        <li>
+        <li data-name="林向然">
           <span class="num">8.</span>
           <span class="name">林向然</span>
           <span class="note">親戚</span>
         </li>
-        <li>
+        <li data-name="林向然">
           <span class="num">9.</span>
           <span class="name">林向然</span>
           <span class="note">親戚</span>
         </li>
-        <li>
+        <li data-name="林向然">
           <span class="num">10.</span>
           <span class="name">林向然</span>
           <span class="note">親戚</span>
         </li>
-        <li>
+        <li data-name="林溢星">
           <span class="num">11.</span>
           <span class="name">林溢星</span>
           <span class="note">親戚</span>
         </li>
-        <li>
+        <li data-name="林溢星">
           <span class="num">12.</span>
           <span class="name">林溢星</span>
           <span class="note">親戚</span>
@@ -735,62 +809,62 @@
         <span class="badge">12/12 人</span>
       </div>
       <ul class="guest-list">
-        <li>
+        <li data-name="呂志聰">
           <span class="num">1.</span>
           <span class="name">呂志聰</span>
           <span class="note">資深8</span>
         </li>
-        <li>
+        <li data-name="呂志聰">
           <span class="num">2.</span>
           <span class="name">呂志聰</span>
           <span class="note">資深8</span>
         </li>
-        <li>
+        <li data-name="高徳耀">
           <span class="num">3.</span>
           <span class="name">高徳耀</span>
           <span class="note">資深8</span>
         </li>
-        <li>
+        <li data-name="高徳耀">
           <span class="num">4.</span>
           <span class="name">高徳耀</span>
           <span class="note">資深8</span>
         </li>
-        <li>
+        <li data-name="譚少熙">
           <span class="num">5.</span>
           <span class="name">譚少熙</span>
           <span class="note">資深8</span>
         </li>
-        <li>
+        <li data-name="譚少熙">
           <span class="num">6.</span>
           <span class="name">譚少熙</span>
           <span class="note">資深8</span>
         </li>
-        <li>
+        <li data-name="羅永莉">
           <span class="num">7.</span>
           <span class="name">羅永莉</span>
           <span class="note">資深8</span>
         </li>
-        <li>
+        <li data-name="羅永莉">
           <span class="num">8.</span>
           <span class="name">羅永莉</span>
           <span class="note">資深8</span>
         </li>
-        <li>
+        <li data-name="黃慧貞校長">
           <span class="num">9.</span>
           <span class="name">黃慧貞校長</span>
           <span class="note">資深8</span>
         </li>
-        <li>
+        <li data-name="霍志文">
           <span class="num">10.</span>
           <span class="name">霍志文</span>
           <span class="note">資深8</span>
         </li>
-        <li>
+        <li data-name="白  威醫生">
           <span class="num">11.</span>
           <span class="name">白  威醫生</span>
           <span class="note">資深8</span>
         </li>
-        <li>
+        <li data-name="余尚實神父★">
           <span class="num">12.</span>
           <span class="name">余尚實神父★</span>
           <span class="note">資深8</span>
@@ -803,62 +877,62 @@
         <span class="badge">12/12 人</span>
       </div>
       <ul class="guest-list">
-        <li>
+        <li data-name="蘇慶霖">
           <span class="num">1.</span>
           <span class="name">蘇慶霖</span>
           <span class="note">資深9</span>
         </li>
-        <li>
+        <li data-name="蘇慶霖">
           <span class="num">2.</span>
           <span class="name">蘇慶霖</span>
           <span class="note">資深9</span>
         </li>
-        <li>
+        <li data-name="蘇慶霖">
           <span class="num">3.</span>
           <span class="name">蘇慶霖</span>
           <span class="note">資深9</span>
         </li>
-        <li>
+        <li data-name="蘇慶霖">
           <span class="num">4.</span>
           <span class="name">蘇慶霖</span>
           <span class="note">資深9</span>
         </li>
-        <li>
+        <li data-name="蘇慶霖">
           <span class="num">5.</span>
           <span class="name">蘇慶霖</span>
           <span class="note">資深9</span>
         </li>
-        <li>
+        <li data-name="陳浩生">
           <span class="num">6.</span>
           <span class="name">陳浩生</span>
           <span class="note">資深9</span>
         </li>
-        <li>
+        <li data-name="彭大偉">
           <span class="num">7.</span>
           <span class="name">彭大偉</span>
           <span class="note">資深9</span>
         </li>
-        <li>
+        <li data-name="林美儀">
           <span class="num">8.</span>
           <span class="name">林美儀</span>
           <span class="note">資深9</span>
         </li>
-        <li>
+        <li data-name="何佑平">
           <span class="num">9.</span>
           <span class="name">何佑平</span>
           <span class="note">資深9</span>
         </li>
-        <li>
+        <li data-name="何佑平">
           <span class="num">10.</span>
           <span class="name">何佑平</span>
           <span class="note">資深9</span>
         </li>
-        <li>
+        <li data-name="何蘊霞">
           <span class="num">11.</span>
           <span class="name">何蘊霞</span>
           <span class="note">資深9</span>
         </li>
-        <li>
+        <li data-name="張榮光">
           <span class="num">12.</span>
           <span class="name">張榮光</span>
           <span class="note">資深9</span>
@@ -868,70 +942,70 @@
     <div class="card" id="t10">
       <div class="card-header">
         <h3>第10席</h3>
-        <span class="badge over">13/12 人</span>
+        <span class="badge">13/12 人</span>
       </div>
       <ul class="guest-list">
-        <li>
+        <li data-name="黃碧蓉">
           <span class="num">1.</span>
           <span class="name">黃碧蓉</span>
           <span class="note">資深10</span>
         </li>
-        <li>
+        <li data-name="關佩玲">
           <span class="num">2.</span>
           <span class="name">關佩玲</span>
           <span class="note">資深10</span>
         </li>
-        <li>
+        <li data-name="范明華">
           <span class="num">3.</span>
           <span class="name">范明華</span>
           <span class="note">資深10</span>
         </li>
-        <li>
+        <li data-name="連麗美">
           <span class="num">4.</span>
           <span class="name">連麗美</span>
           <span class="note">資深10</span>
         </li>
-        <li>
+        <li data-name="黎靜嫻">
           <span class="num">5.</span>
           <span class="name">黎靜嫻</span>
           <span class="note">資深10</span>
         </li>
-        <li>
+        <li data-name="黎靜儀">
           <span class="num">6.</span>
           <span class="name">黎靜儀</span>
           <span class="note">資深10</span>
         </li>
-        <li>
+        <li data-name="雷玉明">
           <span class="num">7.</span>
           <span class="name">雷玉明</span>
           <span class="note">資深10</span>
         </li>
-        <li>
+        <li data-name="麥神父★">
           <span class="num">8.</span>
           <span class="name">麥神父★</span>
           <span class="note">資深10</span>
         </li>
-        <li>
+        <li data-name="林神父★">
           <span class="num">9.</span>
           <span class="name">林神父★</span>
           <span class="note">資深10</span>
         </li>
-        <li>
+        <li data-name="陳執事★">
           <span class="num">10.</span>
           <span class="name">陳執事★</span>
           <span class="note">資深10</span>
         </li>
-        <li>
+        <li data-name="司徒國平">
           <span class="num">11.</span>
           <span class="name">司徒國平</span>
           <span class="note">資深10</span>
         </li>
-        <li>
+        <li data-name="司徒國平">
           <span class="num">12.</span>
           <span class="name">司徒國平</span>
           <span class="note">資深10</span>
         </li>
-        <li>
+        <li data-name="林幗瑛">
           <span class="num">13.</span>
           <span class="name">林幗瑛</span>
           <span class="note">資深10</span>
@@ -944,67 +1018,67 @@
         <span class="badge">13/13 人</span>
       </div>
       <ul class="guest-list">
-        <li>
+        <li data-name="謝宇安">
           <span class="num">1.</span>
           <span class="name">謝宇安</span>
           <span class="note">教育界11</span>
         </li>
-        <li>
+        <li data-name="謝宇安">
           <span class="num">2.</span>
           <span class="name">謝宇安</span>
           <span class="note">教育界11</span>
         </li>
-        <li>
+        <li data-name="謝宇安">
           <span class="num">3.</span>
           <span class="name">謝宇安</span>
           <span class="note">教育界11</span>
         </li>
-        <li>
+        <li data-name="謝宇安">
           <span class="num">4.</span>
           <span class="name">謝宇安</span>
           <span class="note">教育界11</span>
         </li>
-        <li>
+        <li data-name="謝宇安">
           <span class="num">5.</span>
           <span class="name">謝宇安</span>
           <span class="note">教育界11</span>
         </li>
-        <li>
+        <li data-name="吳國輝家姐">
           <span class="num">6.</span>
           <span class="name">吳國輝家姐</span>
           <span class="note">教育界11</span>
         </li>
-        <li>
+        <li data-name="何偉祺">
           <span class="num">7.</span>
           <span class="name">何偉祺</span>
           <span class="note">教育界11</span>
         </li>
-        <li>
+        <li data-name="貞姐">
           <span class="num">8.</span>
           <span class="name">貞姐</span>
           <span class="note">教育界11</span>
         </li>
-        <li>
+        <li data-name="盧太">
           <span class="num">9.</span>
           <span class="name">盧太</span>
           <span class="note">教育界11</span>
         </li>
-        <li>
+        <li data-name="盧嘉怡">
           <span class="num">10.</span>
           <span class="name">盧嘉怡</span>
           <span class="note">教育界11</span>
         </li>
-        <li>
+        <li data-name="劉文聰">
           <span class="num">11.</span>
           <span class="name">劉文聰</span>
           <span class="note">教育界11</span>
         </li>
-        <li>
+        <li data-name="劉文聰">
           <span class="num">12.</span>
           <span class="name">劉文聰</span>
           <span class="note">教育界11</span>
         </li>
-        <li>
+        <li data-name="梁強華">
           <span class="num">13.</span>
           <span class="name">梁強華</span>
           <span class="note">教育界11</span>
@@ -1017,62 +1091,62 @@
         <span class="badge">12/12 人</span>
       </div>
       <ul class="guest-list">
-        <li>
+        <li data-name="吳育英">
           <span class="num">1.</span>
           <span class="name">吳育英</span>
           <span class="note">教育界12</span>
         </li>
-        <li>
+        <li data-name="冼太">
           <span class="num">2.</span>
           <span class="name">冼太</span>
           <span class="note">教育界12</span>
         </li>
-        <li>
+        <li data-name="郭太">
           <span class="num">3.</span>
           <span class="name">郭太</span>
           <span class="note">教育界12</span>
         </li>
-        <li>
+        <li data-name="吳太">
           <span class="num">4.</span>
           <span class="name">吳太</span>
           <span class="note">教育界12</span>
         </li>
-        <li>
+        <li data-name="倪太">
           <span class="num">5.</span>
           <span class="name">倪太</span>
           <span class="note">教育界12</span>
         </li>
-        <li>
+        <li data-name="王先生">
           <span class="num">6.</span>
           <span class="name">王先生</span>
           <span class="note">教育界12</span>
         </li>
-        <li>
+        <li data-name="王太">
           <span class="num">7.</span>
           <span class="name">王太</span>
           <span class="note">教育界12</span>
         </li>
-        <li>
+        <li data-name="程銘雛">
           <span class="num">8.</span>
           <span class="name">程銘雛</span>
           <span class="note">教育界12</span>
         </li>
-        <li>
+        <li data-name="Candy Chu">
           <span class="num">9.</span>
           <span class="name">Candy Chu</span>
           <span class="note">教育界12</span>
         </li>
-        <li>
+        <li data-name="朱智偉">
           <span class="num">10.</span>
           <span class="name">朱智偉</span>
           <span class="note">教育界12</span>
         </li>
-        <li>
+        <li data-name="陳奉慈">
           <span class="num">11.</span>
           <span class="name">陳奉慈</span>
           <span class="note">教育界12</span>
         </li>
-        <li>
+        <li data-name="鍾梁日麗">
           <span class="num">12.</span>
           <span class="name">鍾梁日麗</span>
           <span class="note">教育界12</span>
@@ -1085,72 +1159,72 @@
         <span class="badge">14/14 人</span>
       </div>
       <ul class="guest-list">
-        <li>
+        <li data-name="馮立榮校長">
           <span class="num">1.</span>
           <span class="name">馮立榮校長</span>
           <span class="note">教育界13</span>
         </li>
-        <li>
+        <li data-name="馮立榮校長">
           <span class="num">2.</span>
           <span class="name">馮立榮校長</span>
           <span class="note">教育界13</span>
         </li>
-        <li>
+        <li data-name="林堅校長">
           <span class="num">3.</span>
           <span class="name">林堅校長</span>
           <span class="note">教育界13</span>
         </li>
-        <li>
+        <li data-name="林堅校長">
           <span class="num">4.</span>
           <span class="name">林堅校長</span>
           <span class="note">教育界13</span>
         </li>
-        <li>
+        <li data-name="陳雁群">
           <span class="num">5.</span>
           <span class="name">陳雁群</span>
           <span class="note">教育界13</span>
         </li>
-        <li>
+        <li data-name="賴國讓">
           <span class="num">6.</span>
           <span class="name">賴國讓</span>
           <span class="note">教育界13</span>
         </li>
-        <li>
+        <li data-name="賴國讓">
           <span class="num">7.</span>
           <span class="name">賴國讓</span>
           <span class="note">教育界13</span>
         </li>
-        <li>
+        <li data-name="胡逸熙">
           <span class="num">8.</span>
           <span class="name">胡逸熙</span>
           <span class="note">教育界13</span>
         </li>
-        <li>
+        <li data-name="胡逸熙">
           <span class="num">9.</span>
           <span class="name">胡逸熙</span>
           <span class="note">教育界13</span>
         </li>
-        <li>
+        <li data-name="温怡菁">
           <span class="num">10.</span>
           <span class="name">温怡菁</span>
           <span class="note">教育界13</span>
         </li>
-        <li>
+        <li data-name="温怡菁">
           <span class="num">11.</span>
           <span class="name">温怡菁</span>
           <span class="note">教育界13</span>
         </li>
-        <li>
+        <li data-name="李遠平">
           <span class="num">12.</span>
           <span class="name">李遠平</span>
           <span class="note">教育界13</span>
         </li>
-        <li>
+        <li data-name="老金枝">
           <span class="num">13.</span>
           <span class="name">老金枝</span>
           <span class="note">教育界13</span>
         </li>
-        <li>
+        <li data-name="易麗琼">
           <span class="num">14.</span>
           <span class="name">易麗琼</span>
           <span class="note">教育界13</span>
@@ -1163,67 +1237,67 @@
         <span class="badge">13/13 人</span>
       </div>
       <ul class="guest-list">
-        <li>
+        <li data-name="KWAN">
           <span class="num">1.</span>
           <span class="name">KWAN</span>
           <span class="note">MKDIST</span>
         </li>
-        <li>
+        <li data-name="KEI">
           <span class="num">2.</span>
           <span class="name">KEI</span>
           <span class="note">MKDIST</span>
         </li>
-        <li>
+        <li data-name="OLIVIA">
           <span class="num">3.</span>
           <span class="name">OLIVIA</span>
           <span class="note">MKDIST</span>
         </li>
-        <li>
+        <li data-name="TIN YAU">
           <span class="num">4.</span>
           <span class="name">TIN YAU</span>
           <span class="note">MKDIST</span>
         </li>
-        <li>
+        <li data-name="TIN YAU">
           <span class="num">5.</span>
           <span class="name">TIN YAU</span>
           <span class="note">MKDIST</span>
         </li>
-        <li>
+        <li data-name="KUEN">
           <span class="num">6.</span>
           <span class="name">KUEN</span>
           <span class="note">MKDIST</span>
         </li>
-        <li>
+        <li data-name="KUEN">
           <span class="num">7.</span>
           <span class="name">KUEN</span>
           <span class="note">MKDIST</span>
         </li>
-        <li>
+        <li data-name="MING">
           <span class="num">8.</span>
           <span class="name">MING</span>
           <span class="note">MKDIST</span>
         </li>
-        <li>
+        <li data-name="CHI GOR">
           <span class="num">9.</span>
           <span class="name">CHI GOR</span>
           <span class="note">MKDIST</span>
         </li>
-        <li>
+        <li data-name="MANDY">
           <span class="num">10.</span>
           <span class="name">MANDY</span>
           <span class="note">MKDIST</span>
         </li>
-        <li>
+        <li data-name="WAI">
           <span class="num">11.</span>
           <span class="name">WAI</span>
           <span class="note">MKDIST</span>
         </li>
-        <li>
+        <li data-name="TYSON">
           <span class="num">12.</span>
           <span class="name">TYSON</span>
           <span class="note">MKDIST</span>
         </li>
-        <li>
+        <li data-name="TYSON">
           <span class="num">13.</span>
           <span class="name">TYSON</span>
           <span class="note">MKDIST</span>
@@ -1233,8 +1307,69 @@
   </div>
 
   <footer>
-    根據現場枱位圖（橫向）+ 已指定席次自動整理<br>
-    第10席目前 13 人 / 上限 12 人（超額）
+    根據現場枱位圖 + 已指定席次自動整理<br>
+    支援搜尋姓名快速搵座位
   </footer>
+
+<script>
+const guests = [{"name": "黃炳旋舅父#", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "黃炳旋舅母", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "胡振坤姐夫", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "林秀欣家姐", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "林光蔚大哥", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "林光蔚大嫂", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "林絳華", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "余惠芳", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "林信澤叔叔", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "林信澤嬸嬸", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "陳栢堅媽咪", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "蘇明村博士", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "姐姐（舅父工人）", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "郭錫培", "table": "第2席", "short": "2", "note": "校友"}, {"name": "李少華", "table": "第2席", "short": "2", "note": "校友"}, {"name": "駱意卿", "table": "第2席", "short": "2", "note": "校友"}, {"name": "何麗顏", "table": "第2席", "short": "2", "note": "校友"}, {"name": "林美玲", "table": "第2席", "short": "2", "note": "校友"}, {"name": "萬世艷", "table": "第2席", "short": "2", "note": "校友"}, {"name": "羅與儀", "table": "第2席", "short": "2", "note": "校友"}, {"name": "Caron Tam", "table": "第2席", "short": "2", "note": "校友"}, {"name": "吳國輝", "table": "第2席", "short": "2", "note": "校友"}, {"name": "羅與儀", "table": "第2席", "short": "2", "note": "校友"}, {"name": "Victor", "table": "第2席", "short": "2", "note": "校友"}, {"name": "林斯琪", "table": "第2席", "short": "2", "note": "校友"}, {"name": "李財興", "table": "第3席", "short": "3", "note": "9303"}, {"name": "李婉玲", "table": "第3席", "short": "3", "note": "9303"}, {"name": "黃  偉", "table": "第3席", "short": "3", "note": "9303"}, {"name": "黃炤熙", "table": "第3席", "short": "3", "note": "9303"}, {"name": "梁麗蓉", "table": "第3席", "short": "3", "note": "9303"}, {"name": "賴仲發", "table": "第3席", "short": "3", "note": "9303"}, {"name": "羅愛玲", "table": "第3席", "short": "3", "note": "9303"}, {"name": "羅漢元#", "table": "第3席", "short": "3", "note": "9303"}, {"name": "張柱樑", "table": "第3席", "short": "3", "note": "9303"}, {"name": "Allan", "table": "第3席", "short": "3", "note": "9303"}, {"name": "Eddie", "table": "第3席", "short": "3", "note": "9303"}, {"name": "Kenny", "table": "第3席", "short": "3", "note": "9303"}, {"name": "陳錦儀", "table": "第5席", "short": "5", "note": "9305"}, {"name": "陳錦儀", "table": "第5席", "short": "5", "note": "9305"}, {"name": "張勁光", "table": "第5席", "short": "5", "note": "9305"}, {"name": "張勁光太太", "table": "第5席", "short": "5", "note": "9305"}, {"name": "張爸爸", "table": "第5席", "short": "5", "note": "9305"}, {"name": "張媽媽", "table": "第5席", "short": "5", "note": "9305"}, {"name": "Francis", "table": "第5席", "short": "5", "note": "9305"}, {"name": "SA", "table": "第5席", "short": "5", "note": "9305"}, {"name": "胡達文", "table": "第5席", "short": "5", "note": "9305"}, {"name": "邱婉儀", "table": "第5席", "short": "5", "note": "9305"}, {"name": "楊滿昌", "table": "第5席", "short": "5", "note": "9305"}, {"name": "劉玉丹", "table": "第5席", "short": "5", "note": "9305"}, {"name": "Stephanie", "table": "第5席", "short": "5", "note": "9305"}, {"name": "李蘭桂", "table": "第6席", "short": "6", "note": "9306"}, {"name": "蘇偉雄", "table": "第6席", "short": "6", "note": "9306"}, {"name": "蘇偉雄", "table": "第6席", "short": "6", "note": "9306"}, {"name": "雷依齡", "table": "第6席", "short": "6", "note": "9306"}, {"name": "陳許明#", "table": "第6席", "short": "6", "note": "9306"}, {"name": "陳許明", "table": "第6席", "short": "6", "note": "9306"}, {"name": "陳許明", "table": "第6席", "short": "6", "note": "9306"}, {"name": "余美媚", "table": "第6席", "short": "6", "note": "9306"}, {"name": "余美媚", "table": "第6席", "short": "6", "note": "9306"}, {"name": "Vicky So", "table": "第6席", "short": "6", "note": "9306"}, {"name": "Vicky So", "table": "第6席", "short": "6", "note": "9306"}, {"name": "Vicky So", "table": "第6席", "short": "6", "note": "9306"}, {"name": "阿立", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "阿立", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "黃宇秋", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "黃宇秋", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "黃宇秋", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "黃宇秋", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "林向然", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "林向然", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "林向然", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "林向然", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "林溢星", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "林溢星", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "呂志聰", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "呂志聰", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "高徳耀", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "高徳耀", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "譚少熙", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "譚少熙", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "羅永莉", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "羅永莉", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "黃慧貞校長", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "霍志文", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "白  威醫生", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "余尚實神父★", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "蘇慶霖", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "蘇慶霖", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "蘇慶霖", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "蘇慶霖", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "蘇慶霖", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "陳浩生", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "彭大偉", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "林美儀", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "何佑平", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "何佑平", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "何蘊霞", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "張榮光", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "黃碧蓉", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "關佩玲", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "范明華", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "連麗美", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "黎靜嫻", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "黎靜儀", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "雷玉明", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "麥神父★", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "林神父★", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "陳執事★", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "司徒國平", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "司徒國平", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "林幗瑛", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "謝宇安", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "謝宇安", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "謝宇安", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "謝宇安", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "謝宇安", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "吳國輝家姐", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "何偉祺", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "貞姐", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "盧太", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "盧嘉怡", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "劉文聰", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "劉文聰", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "梁強華", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "吳育英", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "冼太", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "郭太", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "吳太", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "倪太", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "王先生", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "王太", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "程銘雛", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "Candy Chu", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "朱智偉", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "陳奉慈", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "鍾梁日麗", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "馮立榮校長", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "馮立榮校長", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "林堅校長", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "林堅校長", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "陳雁群", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "賴國讓", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "賴國讓", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "胡逸熙", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "胡逸熙", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "温怡菁", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "温怡菁", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "李遠平", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "老金枝", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "易麗琼", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "KWAN", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "KEI", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "OLIVIA", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "TIN YAU", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "TIN YAU", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "KUEN", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "KUEN", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "MING", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "CHI GOR", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "MANDY", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "WAI", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "TYSON", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "TYSON", "table": "第15席", "short": "15", "note": "MKDIST"}];
+
+const input = document.getElementById('searchInput');
+const results = document.getElementById('searchResults');
+const clearBtn = document.getElementById('clearBtn');
+
+function clearHighlights() {
+  document.querySelectorAll('.t.highlight').forEach(el => el.classList.remove('highlight'));
+  document.querySelectorAll('.card.highlight-card').forEach(el => el.classList.remove('highlight-card'));
+  document.querySelectorAll('.guest-list li.hit').forEach(el => el.classList.remove('hit'));
+}
+
+function doSearch() {
+  const q = input.value.trim().toLowerCase();
+  clearHighlights();
+  results.innerHTML = '';
+
+  if (!q) return;
+
+  const hits = guests.filter(g => g.name.toLowerCase().includes(q));
+
+  if (hits.length === 0) {
+    results.innerHTML = '<div class="no-result">搵唔到相關嘉賓</div>';
+    return;
+  }
+
+  // unique tables
+  const tables = [...new Set(hits.map(h => h.short))];
+
+  hits.forEach(h => {
+    const div = document.createElement('div');
+    div.className = 'result-item';
+    div.innerHTML = `<span class="r-name">${h.name}</span><a href="#t${h.short}"><span class="r-table">${h.table}</span></a>`;
+    results.appendChild(div);
+  });
+
+  // highlight circles and cards
+  tables.forEach(short => {
+    const circle = document.getElementById('circle-' + short);
+    if (circle) circle.classList.add('highlight');
+    const card = document.getElementById('t' + short);
+    if (card) card.classList.add('highlight-card');
+  });
+
+  // highlight matching names in lists
+  document.querySelectorAll('.guest-list li[data-name]').forEach(li => {
+    const name = li.getAttribute('data-name').toLowerCase();
+    if (name.includes(q)) li.classList.add('hit');
+  });
+}
+
+input.addEventListener('input', doSearch);
+clearBtn.addEventListener('click', () => {
+  input.value = '';
+  results.innerHTML = '';
+  clearHighlights();
+  input.focus();
+});
+</script>
 </body>
 </html>
