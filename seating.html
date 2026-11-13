@@ -2,8 +2,8 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>宴會座位表｜現場擺位</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>宴會座位表</title>
 <style>
   :root {
     --primary: #1a365d;
@@ -18,34 +18,34 @@
     background: var(--bg);
     color: var(--text);
     line-height: 1.45;
-    padding: 12px;
+    padding: 10px;
     max-width: 960px;
     margin: 0 auto;
   }
   header {
     background: linear-gradient(135deg, #1a365d, #2b6cb0);
     color: white;
-    padding: 16px 18px;
+    padding: 14px 16px;
     border-radius: 12px;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     text-align: center;
   }
-  header h1 { font-size: 1.35rem; margin-bottom: 4px; }
-  header p { font-size: 0.9rem; opacity: 0.9; }
+  header h1 { font-size: 1.25rem; margin-bottom: 3px; }
+  header p { font-size: 0.85rem; opacity: 0.9; }
 
   /* Search */
   .search-box {
     background: white;
     border-radius: 12px;
-    padding: 14px 16px;
-    margin-bottom: 16px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   }
   .search-box label {
     display: block;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--muted);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
   .search-input-wrap {
     display: flex;
@@ -53,10 +53,10 @@
   }
   #searchInput {
     flex: 1;
-    padding: 10px 14px;
+    padding: 11px 12px;
     border: 1.5px solid #cbd5e0;
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: 16px; /* prevent iOS zoom */
     outline: none;
   }
   #searchInput:focus {
@@ -64,143 +64,166 @@
     box-shadow: 0 0 0 3px rgba(43,108,176,0.15);
   }
   #clearBtn {
-    padding: 0 14px;
+    padding: 0 12px;
     border: none;
     background: #e2e8f0;
     border-radius: 8px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--muted);
     cursor: pointer;
+    white-space: nowrap;
   }
-  #searchResults {
-    margin-top: 10px;
-  }
+  #searchResults { margin-top: 8px; }
   .result-item {
-    padding: 10px 12px;
+    padding: 9px 11px;
     background: #ebf8ff;
     border-radius: 8px;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
   }
-  .result-item .r-name { font-weight: 600; }
+  .result-item .r-name { font-weight: 600; font-size: 0.95rem; }
   .result-item .r-table {
     background: #2b6cb0;
     color: white;
-    padding: 3px 10px;
+    padding: 2px 9px;
     border-radius: 12px;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     white-space: nowrap;
   }
-  .result-item a {
-    color: inherit;
-    text-decoration: none;
-  }
-  .no-result {
-    color: var(--muted);
-    font-size: 0.9rem;
-    padding: 6px 0;
-  }
+  .result-item a { color: inherit; text-decoration: none; }
+  .no-result { color: var(--muted); font-size: 0.85rem; padding: 4px 0; }
 
+  /* Floorplan - mobile first */
   .floorplan {
     background: white;
     border-radius: 12px;
-    padding: 18px 12px 22px;
-    margin-bottom: 20px;
+    padding: 14px 8px 16px;
+    margin-bottom: 16px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-    overflow-x: auto;
   }
   .floorplan-title {
     text-align: center;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     color: var(--muted);
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
+
   .layout {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 14px;
-    min-width: 520px;
+    gap: 10px;
+    width: 100%;
   }
   .row {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 12px;
+    gap: 6px;
+    width: 100%;
+    flex-wrap: nowrap;
   }
-  .big-spacer { width: 48px; }
   .t {
-    width: 62px;
-    height: 62px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
-    border: 2.5px solid #4a5568;
+    border: 2px solid #4a5568;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     background: #f7fafc;
     font-weight: 700;
-    font-size: 1.15rem;
+    font-size: 0.95rem;
     color: #2d3748;
     text-decoration: none;
+    flex-shrink: 0;
     transition: transform 0.15s, box-shadow 0.15s;
   }
-  .t:hover, .t:active {
-    transform: scale(1.1);
-    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+  .t:active {
+    transform: scale(1.08);
   }
   .t .c {
-    font-size: 0.62rem;
+    font-size: 0.55rem;
     font-weight: 500;
     opacity: 0.8;
-    margin-top: 1px;
+    margin-top: 0px;
   }
   .t.main {
-    width: 74px;
-    height: 74px;
+    width: 56px;
+    height: 56px;
     background: #ed8936;
     border-color: #c05621;
     color: white;
-    font-size: 1.05rem;
+    font-size: 0.9rem;
   }
   .t.empty {
     border-style: dashed;
-    opacity: 0.35;
+    opacity: 0.3;
     background: transparent;
     pointer-events: none;
   }
   .t.highlight {
-    box-shadow: 0 0 0 4px #f6e05e, 0 4px 14px rgba(0,0,0,0.2);
-    transform: scale(1.12);
+    box-shadow: 0 0 0 3px #f6e05e;
+    transform: scale(1.1);
+  }
+  .spacer {
+    width: 8px;
+    flex-shrink: 0;
   }
   .reception {
-    width: 52px;
-    height: 70px;
+    width: 36px;
+    height: 52px;
     border: 1.5px solid #a0aec0;
-    border-radius: 8px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.78rem;
+    font-size: 0.65rem;
     color: var(--muted);
     background: #edf2f7;
     writing-mode: vertical-rl;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+  }
+
+  /* Larger screens */
+  @media (min-width: 480px) {
+    .t { width: 56px; height: 56px; font-size: 1.05rem; gap: 8px; }
+    .t.main { width: 66px; height: 66px; font-size: 1rem; }
+    .t .c { font-size: 0.6rem; }
+    .row { gap: 8px; }
+    .spacer { width: 16px; }
+    .reception { width: 42px; height: 60px; font-size: 0.72rem; }
+  }
+  @media (min-width: 640px) {
+    .t { width: 62px; height: 62px; font-size: 1.15rem; }
+    .t.main { width: 74px; height: 74px; font-size: 1.05rem; }
+    .t .c { font-size: 0.62rem; }
+    .row { gap: 10px; }
+    .spacer { width: 28px; }
+    .reception { width: 48px; height: 68px; font-size: 0.78rem; }
   }
 
   .section-title {
-    font-size: 1.05rem;
+    font-size: 1rem;
     font-weight: 600;
-    margin: 6px 0 12px;
+    margin: 4px 0 10px;
     color: var(--primary);
   }
   .cards {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 14px;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  @media (min-width: 520px) {
+    .cards { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 800px) {
+    .cards { grid-template-columns: repeat(3, 1fr); }
   }
   .card {
     background: white;
@@ -215,7 +238,7 @@
   .card-header {
     background: #2b6cb0;
     color: white;
-    padding: 10px 14px;
+    padding: 9px 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -223,22 +246,20 @@
   .card-header.main-header {
     background: linear-gradient(135deg, #c05621, #dd6b20);
   }
-  .card-header h3 { font-size: 1rem; }
+  .card-header h3 { font-size: 0.95rem; }
   .badge {
     background: rgba(255,255,255,0.25);
     padding: 2px 8px;
     border-radius: 10px;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
-  .guest-list {
-    list-style: none;
-  }
+  .guest-list { list-style: none; }
   .guest-list li {
-    padding: 7px 14px;
+    padding: 6px 12px;
     display: flex;
     gap: 8px;
     border-bottom: 1px solid #f0f0f0;
-    font-size: 0.92rem;
+    font-size: 0.9rem;
   }
   .guest-list li:nth-child(even) { background: #f7fafc; }
   .guest-list li:last-child { border-bottom: none; }
@@ -246,70 +267,66 @@
     background: #fefcbf !important;
     font-weight: 600;
   }
-  .num { color: var(--muted); min-width: 20px; font-size: 0.85rem; }
+  .num { color: var(--muted); min-width: 18px; font-size: 0.8rem; }
   .name { font-weight: 500; flex: 1; }
-  .note { font-size: 0.78rem; color: var(--muted); }
+  .note { font-size: 0.75rem; color: var(--muted); }
 
   footer {
     text-align: center;
-    margin-top: 24px;
-    padding: 12px;
+    margin-top: 20px;
+    padding: 10px;
     color: var(--muted);
-    font-size: 0.8rem;
-  }
-
-  @media (max-width: 560px) {
-    .layout { min-width: 0; transform: scale(0.90); transform-origin: top center; }
-    .t { width: 52px; height: 52px; font-size: 1rem; }
-    .t.main { width: 62px; height: 62px; }
-    .row { gap: 8px; }
+    font-size: 0.75rem;
   }
 </style>
 </head>
 <body>
   <header>
     <h1>宴會座位表</h1>
-    <p>總人數 175　｜　按現場實際橫向擺位</p>
+    <p>總人數 175　｜　現場擺位</p>
   </header>
 
   <div class="search-box">
     <label for="searchInput">搜尋嘉賓姓名</label>
     <div class="search-input-wrap">
-      <input type="text" id="searchInput" placeholder="輸入姓名（支援部分字）..." autocomplete="off">
+      <input type="text" id="searchInput" placeholder="輸入姓名..." autocomplete="off">
       <button id="clearBtn" type="button">清除</button>
     </div>
     <div id="searchResults"></div>
   </div>
 
   <div class="floorplan">
-    <div class="floorplan-title">現場枱位示意圖（點擊可跳到名單）</div>
+    <div class="floorplan-title">現場枱位（點擊跳到名單）</div>
     <div class="layout">
+      <!-- Top: 10 9 8   主家   5 3 1 -->
       <div class="row">
-        <a href="#t10" class="t" id="circle-10">10<span class="c">12位</span></a>
-        <a href="#t9" class="t" id="circle-9">9<span class="c">12位</span></a>
-        <a href="#t8" class="t" id="circle-8">8<span class="c">12位</span></a>
-        <div class="big-spacer"></div>
-        <a href="#t主家" class="t main" id="circle-主家">主家<span class="c">13位</span></a>
-        <div class="big-spacer"></div>
-        <a href="#t5" class="t" id="circle-5">5<span class="c">13位</span></a>
-        <a href="#t3" class="t" id="circle-3">3<span class="c">12位</span></a>
-        <a href="#t1" class="t" id="circle-1">1<span class="c">12位</span></a>
+        <a href="#t10" class="t" id="circle-10">10<span class="c">12</span></a>
+        <a href="#t9" class="t" id="circle-9">9<span class="c">12</span></a>
+        <a href="#t8" class="t" id="circle-8">8<span class="c">12</span></a>
+        <div class="spacer"></div>
+        <a href="#t主家" class="t main" id="circle-主家">主家<span class="c">13</span></a>
+        <div class="spacer"></div>
+        <a href="#t5" class="t" id="circle-5">5<span class="c">13</span></a>
+        <a href="#t3" class="t" id="circle-3">3<span class="c">12</span></a>
+        <a href="#t1" class="t" id="circle-1">1<span class="c">12</span></a>
       </div>
+      <!-- Mid: 11 12 13      7 6 2 -->
       <div class="row">
-        <a href="#t11" class="t" id="circle-11">11<span class="c">13位</span></a>
-        <a href="#t12" class="t" id="circle-12">12<span class="c">12位</span></a>
-        <a href="#t13" class="t" id="circle-13">13<span class="c">14位</span></a>
-        <div class="big-spacer"></div>
-        <div class="big-spacer"></div>
-        <div class="big-spacer"></div>
-        <a href="#t7" class="t" id="circle-7">7<span class="c">12位</span></a>
-        <a href="#t6" class="t" id="circle-6">6<span class="c">12位</span></a>
-        <a href="#t2" class="t" id="circle-2">2<span class="c">12位</span></a>
+        <a href="#t11" class="t" id="circle-11">11<span class="c">13</span></a>
+        <a href="#t12" class="t" id="circle-12">12<span class="c">12</span></a>
+        <a href="#t13" class="t" id="circle-13">13<span class="c">14</span></a>
+        <div class="spacer"></div>
+        <div class="spacer"></div>
+        <div class="spacer"></div>
+        <a href="#t7" class="t" id="circle-7">7<span class="c">12</span></a>
+        <a href="#t6" class="t" id="circle-6">6<span class="c">12</span></a>
+        <a href="#t2" class="t" id="circle-2">2<span class="c">12</span></a>
       </div>
+      <!-- Bot: empty 15  接待處 -->
       <div class="row">
         <div class="t empty"></div>
-        <a href="#t15" class="t" id="circle-15">15<span class="c">13位</span></a>
-        <div class="big-spacer"></div>
+        <a href="#t15" class="t" id="circle-15">15<span class="c">13</span></a>
+        <div class="spacer"></div>
         <div class="reception">接待處</div>
       </div>
     </div>
@@ -1307,13 +1324,11 @@
   </div>
 
   <footer>
-    根據現場枱位圖 + 已指定席次自動整理<br>
-    支援搜尋姓名快速搵座位
+    支援搜尋姓名快速搵座位　｜　手機版已優化
   </footer>
 
 <script>
 const guests = [{"name": "黃炳旋舅父#", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "黃炳旋舅母", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "胡振坤姐夫", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "林秀欣家姐", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "林光蔚大哥", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "林光蔚大嫂", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "林絳華", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "余惠芳", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "林信澤叔叔", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "林信澤嬸嬸", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "陳栢堅媽咪", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "蘇明村博士", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "姐姐（舅父工人）", "table": "主家席", "short": "主家", "note": "主家親戚"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "梁景芳", "table": "第1席", "short": "1", "note": "9301"}, {"name": "郭錫培", "table": "第2席", "short": "2", "note": "校友"}, {"name": "李少華", "table": "第2席", "short": "2", "note": "校友"}, {"name": "駱意卿", "table": "第2席", "short": "2", "note": "校友"}, {"name": "何麗顏", "table": "第2席", "short": "2", "note": "校友"}, {"name": "林美玲", "table": "第2席", "short": "2", "note": "校友"}, {"name": "萬世艷", "table": "第2席", "short": "2", "note": "校友"}, {"name": "羅與儀", "table": "第2席", "short": "2", "note": "校友"}, {"name": "Caron Tam", "table": "第2席", "short": "2", "note": "校友"}, {"name": "吳國輝", "table": "第2席", "short": "2", "note": "校友"}, {"name": "羅與儀", "table": "第2席", "short": "2", "note": "校友"}, {"name": "Victor", "table": "第2席", "short": "2", "note": "校友"}, {"name": "林斯琪", "table": "第2席", "short": "2", "note": "校友"}, {"name": "李財興", "table": "第3席", "short": "3", "note": "9303"}, {"name": "李婉玲", "table": "第3席", "short": "3", "note": "9303"}, {"name": "黃  偉", "table": "第3席", "short": "3", "note": "9303"}, {"name": "黃炤熙", "table": "第3席", "short": "3", "note": "9303"}, {"name": "梁麗蓉", "table": "第3席", "short": "3", "note": "9303"}, {"name": "賴仲發", "table": "第3席", "short": "3", "note": "9303"}, {"name": "羅愛玲", "table": "第3席", "short": "3", "note": "9303"}, {"name": "羅漢元#", "table": "第3席", "short": "3", "note": "9303"}, {"name": "張柱樑", "table": "第3席", "short": "3", "note": "9303"}, {"name": "Allan", "table": "第3席", "short": "3", "note": "9303"}, {"name": "Eddie", "table": "第3席", "short": "3", "note": "9303"}, {"name": "Kenny", "table": "第3席", "short": "3", "note": "9303"}, {"name": "陳錦儀", "table": "第5席", "short": "5", "note": "9305"}, {"name": "陳錦儀", "table": "第5席", "short": "5", "note": "9305"}, {"name": "張勁光", "table": "第5席", "short": "5", "note": "9305"}, {"name": "張勁光太太", "table": "第5席", "short": "5", "note": "9305"}, {"name": "張爸爸", "table": "第5席", "short": "5", "note": "9305"}, {"name": "張媽媽", "table": "第5席", "short": "5", "note": "9305"}, {"name": "Francis", "table": "第5席", "short": "5", "note": "9305"}, {"name": "SA", "table": "第5席", "short": "5", "note": "9305"}, {"name": "胡達文", "table": "第5席", "short": "5", "note": "9305"}, {"name": "邱婉儀", "table": "第5席", "short": "5", "note": "9305"}, {"name": "楊滿昌", "table": "第5席", "short": "5", "note": "9305"}, {"name": "劉玉丹", "table": "第5席", "short": "5", "note": "9305"}, {"name": "Stephanie", "table": "第5席", "short": "5", "note": "9305"}, {"name": "李蘭桂", "table": "第6席", "short": "6", "note": "9306"}, {"name": "蘇偉雄", "table": "第6席", "short": "6", "note": "9306"}, {"name": "蘇偉雄", "table": "第6席", "short": "6", "note": "9306"}, {"name": "雷依齡", "table": "第6席", "short": "6", "note": "9306"}, {"name": "陳許明#", "table": "第6席", "short": "6", "note": "9306"}, {"name": "陳許明", "table": "第6席", "short": "6", "note": "9306"}, {"name": "陳許明", "table": "第6席", "short": "6", "note": "9306"}, {"name": "余美媚", "table": "第6席", "short": "6", "note": "9306"}, {"name": "余美媚", "table": "第6席", "short": "6", "note": "9306"}, {"name": "Vicky So", "table": "第6席", "short": "6", "note": "9306"}, {"name": "Vicky So", "table": "第6席", "short": "6", "note": "9306"}, {"name": "Vicky So", "table": "第6席", "short": "6", "note": "9306"}, {"name": "阿立", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "阿立", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "黃宇秋", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "黃宇秋", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "黃宇秋", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "黃宇秋", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "林向然", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "林向然", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "林向然", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "林向然", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "林溢星", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "林溢星", "table": "第7席", "short": "7", "note": "親戚"}, {"name": "呂志聰", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "呂志聰", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "高徳耀", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "高徳耀", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "譚少熙", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "譚少熙", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "羅永莉", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "羅永莉", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "黃慧貞校長", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "霍志文", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "白  威醫生", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "余尚實神父★", "table": "第8席", "short": "8", "note": "資深8"}, {"name": "蘇慶霖", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "蘇慶霖", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "蘇慶霖", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "蘇慶霖", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "蘇慶霖", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "陳浩生", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "彭大偉", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "林美儀", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "何佑平", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "何佑平", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "何蘊霞", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "張榮光", "table": "第9席", "short": "9", "note": "資深9"}, {"name": "黃碧蓉", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "關佩玲", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "范明華", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "連麗美", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "黎靜嫻", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "黎靜儀", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "雷玉明", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "麥神父★", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "林神父★", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "陳執事★", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "司徒國平", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "司徒國平", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "林幗瑛", "table": "第10席", "short": "10", "note": "資深10"}, {"name": "謝宇安", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "謝宇安", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "謝宇安", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "謝宇安", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "謝宇安", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "吳國輝家姐", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "何偉祺", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "貞姐", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "盧太", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "盧嘉怡", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "劉文聰", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "劉文聰", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "梁強華", "table": "第11席", "short": "11", "note": "教育界11"}, {"name": "吳育英", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "冼太", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "郭太", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "吳太", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "倪太", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "王先生", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "王太", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "程銘雛", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "Candy Chu", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "朱智偉", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "陳奉慈", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "鍾梁日麗", "table": "第12席", "short": "12", "note": "教育界12"}, {"name": "馮立榮校長", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "馮立榮校長", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "林堅校長", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "林堅校長", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "陳雁群", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "賴國讓", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "賴國讓", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "胡逸熙", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "胡逸熙", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "温怡菁", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "温怡菁", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "李遠平", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "老金枝", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "易麗琼", "table": "第13席", "short": "13", "note": "教育界13"}, {"name": "KWAN", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "KEI", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "OLIVIA", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "TIN YAU", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "TIN YAU", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "KUEN", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "KUEN", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "MING", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "CHI GOR", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "MANDY", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "WAI", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "TYSON", "table": "第15席", "short": "15", "note": "MKDIST"}, {"name": "TYSON", "table": "第15席", "short": "15", "note": "MKDIST"}];
-
 const input = document.getElementById('searchInput');
 const results = document.getElementById('searchResults');
 const clearBtn = document.getElementById('clearBtn');
@@ -1328,19 +1343,15 @@ function doSearch() {
   const q = input.value.trim().toLowerCase();
   clearHighlights();
   results.innerHTML = '';
-
   if (!q) return;
 
   const hits = guests.filter(g => g.name.toLowerCase().includes(q));
-
   if (hits.length === 0) {
     results.innerHTML = '<div class="no-result">搵唔到相關嘉賓</div>';
     return;
   }
 
-  // unique tables
   const tables = [...new Set(hits.map(h => h.short))];
-
   hits.forEach(h => {
     const div = document.createElement('div');
     div.className = 'result-item';
@@ -1348,7 +1359,6 @@ function doSearch() {
     results.appendChild(div);
   });
 
-  // highlight circles and cards
   tables.forEach(short => {
     const circle = document.getElementById('circle-' + short);
     if (circle) circle.classList.add('highlight');
@@ -1356,10 +1366,8 @@ function doSearch() {
     if (card) card.classList.add('highlight-card');
   });
 
-  // highlight matching names in lists
   document.querySelectorAll('.guest-list li[data-name]').forEach(li => {
-    const name = li.getAttribute('data-name').toLowerCase();
-    if (name.includes(q)) li.classList.add('hit');
+    if (li.getAttribute('data-name').toLowerCase().includes(q)) li.classList.add('hit');
   });
 }
 
